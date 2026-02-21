@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Verrouillage strict de l'axe X pour éviter le scroll horizontal sur mobile */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@layer base {
+  html {
+    font-family: theme('fontFamily.sans');
+    color: theme('colors.gray.900');
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: theme('fontFamily.display');
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  p, span, div, input, button, select, textarea {
+    font-family: theme('fontFamily.sans');
+  }
+
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer utilities {
+  .font-numbers {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RECHARTS OVERRIDES - NUCLEAR OPTION */
+.recharts-wrapper,
+.recharts-surface,
+.recharts-layer,
+.recharts-responsive-container {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Cible spécifique pour le focus */
+:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none !important;
+}
