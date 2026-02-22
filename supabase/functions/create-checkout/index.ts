@@ -20,28 +20,44 @@ serve(async (req) => {
     })
 
     // 3. Récupération des données du Body
-    const { priceId, email, origin } = await req.json()
+    const { priceId, email } = await req.json()
+
+    // URLs de redirection en production (éviter localhost)
+    const baseUrl = "https://worthmyrate.com"
+    const success_url = `${baseUrl}/dashboard`
+    const cancel_url = `${baseUrl}/pricing`
 
     // 4. Création de la Session Stripe
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: "subscription",
-      customer_email: email, // Pré-remplit l'email sur la page Stripe
-      success_url: `${origin}/dashboard?payment=success`,
-      cancel_url: `${origin}/pricing?payment=cancelled`,
-    })
+    let session
+    try {
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        customer_email: email,
+        success_url,
+        cancel_url,
+      })
+    } catch (stripeError) {
+      console.error("stripe.checkout.sessions.create error:", stripeError)
+      const message = stripeError instanceof Error ? stripeError.message : String(stripeError)
+      return new Response(JSON.stringify({ error: message }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      })
+    }
 
     // 5. Réponse avec l'URL
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     })
   } catch (error) {
+    console.error("create-checkout error:", error)
     const message = error instanceof Error ? error.message : String(error)
     return new Response(JSON.stringify({ error: message }), {
       status: 400,

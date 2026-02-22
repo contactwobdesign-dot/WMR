@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Mail, ArrowLeft } from 'lucide-react'
 import { PageGradient } from '../components/Layout/PageGradient'
 import { supabase } from '../lib/supabase'
+import { SITE_URL } from '../lib/appConfig'
 
 function ForgotPassword() {
   const { t } = useTranslation()
@@ -24,7 +25,7 @@ function ForgotPassword() {
         return
       }
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${SITE_URL}/reset-password`,
       })
       if (error) throw error
       setSuccess(true)

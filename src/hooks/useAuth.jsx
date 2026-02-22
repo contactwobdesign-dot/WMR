@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { SITE_URL } from '../lib/appConfig'
 
 // Create Auth Context
 const AuthContext = createContext({
@@ -64,7 +65,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // Sign up function
+  // Sign up function (emailRedirectTo = retour après clic sur le lien de confirmation Resend/Supabase)
   const signUp = async (email, password) => {
     if (!supabase) {
       return { data: null, error: new Error('Supabase not initialized') }
@@ -73,6 +74,9 @@ export function AuthProvider({ children }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${SITE_URL}/auth/callback`,
+      },
     })
     
     return { data, error }

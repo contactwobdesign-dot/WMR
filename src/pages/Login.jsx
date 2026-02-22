@@ -6,6 +6,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { PageGradient } from '../components/Layout/PageGradient'
 import { supabase } from '../lib/supabase'
+import { SITE_URL } from '../lib/appConfig'
 
 function Login() {
   const { t } = useTranslation()
@@ -63,7 +64,7 @@ function Login() {
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: `${SITE_URL}/auth/callback`,
         },
       })
 
