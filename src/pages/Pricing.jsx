@@ -58,28 +58,42 @@ function Pricing() {
 
   const handleUpgrade = async () => {
     if (!user) {
+      console.log('[Pricing.handleUpgrade] no user, redirect to signup')
       navigate('/signup?redirect=pricing')
+      return
+    }
+    if (!user.email) {
+      console.error('[Pricing.handleUpgrade] user has no email')
+      alert(t('pricing.checkout.error_generic'))
       return
     }
 
     setCheckoutLoading(true)
+    console.log('[Pricing.handleUpgrade] starting checkout', { billingCycle, hasUser: !!user })
     try {
       const priceId = billingCycle === 'monthly'
         ? import.meta.env.VITE_STRIPE_PRICE_MONTHLY
         : import.meta.env.VITE_STRIPE_PRICE_ANNUAL
+      if (!priceId) {
+        console.error('[Pricing.handleUpgrade] missing VITE_STRIPE_PRICE_* env')
+        throw new Error(t('pricing.checkout.error_generic'))
+      }
 
       const { url, error } = await createCheckoutSession(priceId, user.email)
 
       if (error) {
+        console.error('[Pricing.handleUpgrade] createCheckoutSession error:', error)
         throw new Error(error.message)
       }
       if (!url) {
+        console.error('[Pricing.handleUpgrade] no url returned')
         throw new Error(t('pricing.checkout.error_no_url'))
       }
 
+      console.log('[Pricing.handleUpgrade] redirecting to Stripe Checkout')
       window.location.href = url
     } catch (err) {
-      console.error("Stripe init failed:", err)
+      console.error('[Pricing.handleUpgrade] failed:', err)
       alert(err?.message || t('pricing.checkout.error_generic'))
     } finally {
       setCheckoutLoading(false)
