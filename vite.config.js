@@ -40,7 +40,7 @@ export default defineConfig({
         '/reset-password',
         '/settings',
       ],
-      generateRobotsTxt: true,
+      generateRobotsTxt: false,
     }),
   ],
 })
