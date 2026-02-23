@@ -1673,9 +1673,55 @@
   },
   "seo_pricing": {
     "title": "How Much Should You Charge for Sponsorships?",
+    "body_why_undercharge_title": "Why Most Creators Undercharge",
     "subtitle": "The complete guide to pricing brand deals in 2025",
     "meta_title": "How Much to Charge for Sponsorships - Creator Pricing Guide 2025",
-    "meta_description": "Learn exactly how much to charge for sponsorships on YouTube, Instagram, TikTok, and podcasts. Free calculator + expert pricing guide."
+    "meta_description": "Learn exactly how much to charge for sponsorships on YouTube, Instagram, TikTok, and podcasts. Free calculator + expert pricing guide.",
+
+    "body_why_undercharge_p1": "According to industry research, around 87% of creators undercharge for their first brand partnership. This isn’t a lack of professionalism – it’s a lack of market data to price confidently.",
+    "body_why_undercharge_p2": "Without clear benchmarks for what other creators with similar metrics charge, most people fall into one of these patterns:",
+    "body_why_undercharge_li1_strong": "Accept the first offer",
+    "body_why_undercharge_li1_after": " – many brands intentionally start low, expecting you to negotiate.",
+    "body_why_undercharge_li2_strong": "Make up a number",
+    "body_why_undercharge_li2_after": " – usually too low, driven by fear of scaring the brand away.",
+    "body_why_undercharge_li3_strong": "Ask “What’s your budget?”",
+    "body_why_undercharge_li3_after": " – which hands all negotiating power to the brand.",
+
+    "body_barriers_intro": "Three main psychological barriers explain most of this undercharging:",
+
+    "body_lack_data_title": "1. Lack of Market Data",
+    "body_lack_data_p1": "You can’t price what you can’t measure. Unlike traditional jobs with salary benchmarks and public data, creator sponsorship rates are rarely discussed openly. This information asymmetry heavily favors brands, who work with hundreds of creators and know exactly what market rates look like.",
+
+    "body_fear_loss_title": "2. Fear of Losing the Deal",
+    "body_fear_loss_p1": "When a brand reaches out – especially for your first few partnerships – the fear of “messing it up” is huge. You think: “What if I ask for too much and they walk away?”. In reality, if a brand truly wants to work with you, they almost always have budget flexibility: the first offer is rarely their maximum.",
+
+    "body_imposter_title": "3. Imposter Syndrome",
+    "body_imposter_p1": "Many creators think: “Who am I to charge $1,000? I’m not a big influencer.” Brands, however, are not paying for your ego – they’re paying for access to your audience. If you have 10,000 engaged followers in a high-value niche (B2B, finance, health, tech…), you deserve to be paid at market rate.",
+
+    "body_rates_overview_title": "Sponsorship Rates by Platform (2025 Overview)",
+    "body_rates_overview_p1": "Here’s a quick overview of standard sponsorship rate ranges across major platforms. Click each platform-specific calculator for detailed breakdowns and a tailored estimate.",
+
+    "body_rates_table_head_platform": "Platform",
+    "body_rates_table_head_model": "Pricing Model",
+    "body_rates_table_head_range": "Typical Range",
+
+    "body_rates_youtube_label": "YouTube",
+    "body_rates_youtube_model": "CPM (per 1,000 views)",
+    "body_rates_youtube_range": "$20–$50 depending on niche and audience quality",
+
+    "body_rates_instagram_label": "Instagram",
+    "body_rates_instagram_model": "Per post / Reel / Story",
+    "body_rates_instagram_range": "$100–$1,000+ per 10k followers, depending on engagement rate",
+
+    "body_rates_tiktok_label": "TikTok",
+    "body_rates_tiktok_model": "Per video (based on average views)",
+    "body_rates_tiktok_range": "$200–$1,000 per 10k followers, depending on viral potential",
+
+    "body_rates_podcast_label": "Podcast",
+    "body_rates_podcast_model": "CPM (per 1,000 downloads)",
+    "body_rates_podcast_range": "$18–$50 based on downloads and niche",
+
+    "body_rates_note": "These are baseline ranges for general content. Premium niches (finance, tech, business, health) can justify 2–3x these rates. Use our platform-specific calculators for precise pricing."
   },
   "auth": {
     "common": {

@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 8, color: colors.textLight, marginBottom: 6, textTransform: 'uppercase', fontWeight: 'bold' },
   statValue: { fontSize: 20, color: colors.secondary, fontWeight: 'bold' },
   statSub: { fontSize: 8, color: colors.primary, marginTop: 4 },
+  engagementBar: { fontSize: 8, color: colors.primary, marginTop: 2 },
   growthTag: { fontSize: 8, color: colors.accent, marginTop: 2, fontWeight: 'bold' },
 
   // VIRAL BOX
@@ -72,8 +73,9 @@ const styles = StyleSheet.create({
   priceBox: { backgroundColor: colors.secondary, borderRadius: 8, padding: 25, alignItems: 'center', marginTop: 5 },
   priceLabel: { color: '#9CA3AF', fontSize: 9, marginBottom: 8, letterSpacing: 1 },
   priceValue: { color: colors.white, fontSize: 32, fontWeight: 'bold' },
-  priceValidity: { color: '#6B7280', fontSize: 8, marginTop: 8, fontStyle: 'italic' }, // Font style might be ignored if not loaded, safe fallback
+  priceValidity: { color: '#6B7280', fontSize: 8, marginTop: 8, fontStyle: 'italic' },
   priceRange: { color: colors.primary, fontSize: 10, marginTop: 4 },
+  priceNote: { color: '#9CA3AF', fontSize: 7, marginTop: 4 },
 
   // FOOTER
   footer: { position: 'absolute', bottom: 30, left: 30, right: 30, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 15, flexDirection: 'row', justifyContent: 'space-between' },
@@ -103,6 +105,39 @@ const formatCompact = (num) => {
   }).format(n)
 }
 
+const buildBar = (percent) => {
+  const p = Number(percent) || 0
+  const ratio = Math.max(0, Math.min(p / 10, 1)) // 0–10% mapped to 0–1
+  const total = 5
+  const filled = Math.round(total * ratio)
+  return '▮'.repeat(filled) + '▯'.repeat(total - filled)
+}
+
+const normalizeLocation = (loc) => {
+  const key = String(loc || '').toLowerCase()
+  const map = {
+    global: 'Global',
+    'worldwide': 'Worldwide',
+    'north_america': 'North America',
+    'latin_america': 'Latin America',
+    'south_america': 'South America',
+    'western_eu': 'Western Europe',
+    'western_europe': 'Western Europe',
+    'eastern_eu': 'Eastern Europe',
+    'eastern_europe': 'Eastern Europe',
+    'central_europe': 'Central Europe',
+    'uk_ireland': 'UK & Ireland',
+    'middle_east': 'Middle East',
+    'mena': 'Middle East & North Africa',
+    'north_africa': 'North Africa',
+    'sub_saharan_africa': 'Sub‑Saharan Africa',
+    'south_asia': 'South Asia',
+    'south_east_asia': 'Southeast Asia',
+    'oceania': 'Oceania'
+  }
+  return map[key] || (loc || 'Global')
+}
+
 // MediaKit PDF Document Component (nouveau layout enrichi)
 export const MediaKitPDF = ({
   userData,
@@ -127,10 +162,11 @@ export const MediaKitPDF = ({
 
   // Calculs dérivés (Idées "Super")
   const viralPotential = Math.round(safeData.avgViews * 2.5) // Estimation d'un "Hit"
-  const nextMonth = new Date()
-  nextMonth.setMonth(nextMonth.getMonth() + 1)
-  const validityString = `Rates valid until ${nextMonth.toLocaleString('en-US', {
+  const now = new Date()
+  const lastDayNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0)
+  const validityString = `Rates valid until ${lastDayNextMonth.toLocaleString('en-US', {
     month: 'long',
+    day: 'numeric',
     year: 'numeric',
   })}`
 
@@ -181,24 +217,27 @@ export const MediaKitPDF = ({
           </View>
         </View>
 
-        {/* SECTION 1: PERFORMANCE & MOMENTUM */}
+        {/* SECTION 1: PERFORMANCE INSIGHTS */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Performance (Last 30 Days)</Text>
+          <Text style={styles.sectionTitle}>Performance Insights (Last 30 Days)</Text>
           <View style={styles.row}>
             <View style={styles.card}>
-              <Text style={styles.statLabel}>Avg. Views</Text>
+              <Text style={styles.statLabel}>Verified Reach</Text>
               <Text style={styles.statValue}>{formatCompact(safeData.avgViews)}</Text>
-              <Text style={styles.statSub}>Consistent Reach</Text>
+              <Text style={styles.statSub}>Consistent reach across recent content</Text>
             </View>
             <View style={styles.card}>
               <Text style={styles.statLabel}>Engagement</Text>
-              <Text style={styles.statValue}>{safeData.engagement}%</Text>
-              <Text style={styles.statSub}>Active Community</Text>
+              <Text style={styles.statValue}>
+                {Number(safeData.engagement || 0).toFixed(1)}%
+              </Text>
+              <Text style={styles.engagementBar}>{buildBar(safeData.engagement)}</Text>
+              <Text style={styles.statSub}>Engaged, conversion-ready audience</Text>
             </View>
             <View style={styles.card}>
               <Text style={styles.statLabel}>Total Audience</Text>
               <Text style={styles.statValue}>{formatCompact(safeData.subscribers)}</Text>
-              <Text style={styles.growthTag}>↗ +2.4% MoM</Text>
+              <Text style={styles.growthTag}>▲ +2.4% MoM growth</Text>
             </View>
           </View>
 
@@ -206,19 +245,19 @@ export const MediaKitPDF = ({
           <View style={styles.viralBox}>
             <View>
               <Text style={styles.viralTitle}>Viral Potential (Est. Reach)</Text>
-              <Text style={styles.viralDesc}>Projected views for high-performing content</Text>
+              <Text style={styles.viralDesc}>Projected reach for a top-performing collaboration</Text>
             </View>
-            <Text style={styles.viralValue}>~{formatCompact(viralPotential)} Views</Text>
+            <Text style={styles.viralValue}>~{formatCompact(viralPotential)} views</Text>
           </View>
         </View>
 
-        {/* SECTION 2: CONTEXT */}
+        {/* SECTION 2: AUDIENCE BREAKDOWN */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Audience Profile</Text>
+          <Text style={styles.sectionTitle}>Audience Breakdown</Text>
           <View style={styles.row}>
             <View style={styles.card}>
-              <Text style={styles.statLabel}>Primary Location</Text>
-              <Text style={styles.statValue}>{safeData.location}</Text>
+              <Text style={styles.statLabel}>Audience Geography</Text>
+              <Text style={styles.statValue}>{normalizeLocation(safeData.location)}</Text>
             </View>
             <View style={styles.card}>
               <Text style={styles.statLabel}>Niche</Text>
@@ -227,25 +266,29 @@ export const MediaKitPDF = ({
           </View>
         </View>
 
-        {/* SECTION 3: INVESTMENT & URGENCY */}
+        {/* SECTION 3: SMART PRICING / INVESTMENT */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Partnership Investment</Text>
           <View style={styles.priceBox}>
-            <Text style={styles.priceLabel}>RECOMMENDED RATE (1 INTEGRATION)</Text>
+            <Text style={styles.priceLabel}>PARTNERSHIP INVESTMENT (1 INTEGRATION)</Text>
             <Text style={styles.priceValue}>
               {formatCurrency(safeData.priceAvg, currencySymbol)}
             </Text>
             <Text style={styles.priceRange}>
-              Range: {formatCurrency(safeData.priceMin, currencySymbol)} - {formatCurrency(safeData.priceMax, currencySymbol)}
+              Typical range: {formatCurrency(safeData.priceMin, currencySymbol)} – {formatCurrency(safeData.priceMax, currencySymbol)}
             </Text>
-            {/* Urgency Trigger */}
+            <Text style={styles.priceNote}>
+              Standard rates include 30-day organic usage rights.
+            </Text>
             <Text style={styles.priceValidity}>{validityString}</Text>
           </View>
         </View>
 
-        {/* FOOTER */}
+        {/* FOOTER / TRUST SIGNALS */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Powered by WhatsMyRate.com</Text>
+          <Text style={styles.footerText}>
+            Powered by WhatsMyRate.com · Data Verified by WMR
+          </Text>
           <Text style={styles.footerText}>
             {user?.portfolio || 'Professional Analysis'}
           </Text>
