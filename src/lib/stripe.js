@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import posthog from 'posthog-js'
 
 /**
  * Crée une session Stripe Checkout côté serveur (Edge Function).
@@ -22,6 +23,18 @@ export async function createCheckoutSession(priceId, userEmail) {
   console.log('[Stripe] JWT present:', !!session, sessionError ? `(session error: ${sessionError.message})` : '')
   if (sessionError || !session) {
     console.error('[createCheckoutSession] no active session', sessionError)
+    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    if (posthog && !isLocalhost) {
+      try {
+        posthog.capture('edge_function_error', {
+          error: sessionError?.message || 'No active session',
+          function: 'create-checkout',
+          stage: 'getSession',
+        })
+      } catch (e) {
+        console.error('PostHog edge_function_error (getSession) error:', e)
+      }
+    }
     return { error: { message: 'Vous devez être connecté pour accéder au paiement.' } }
   }
 
@@ -39,6 +52,18 @@ export async function createCheckoutSession(priceId, userEmail) {
 
   if (error) {
     console.error('[createCheckoutSession] invoke error:', error)
+    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    if (posthog && !isLocalhost) {
+      try {
+        posthog.capture('edge_function_error', {
+          error: error.message || String(error),
+          function: 'create-checkout',
+          stage: 'invoke',
+        })
+      } catch (e) {
+        console.error('PostHog edge_function_error (invoke) error:', e)
+      }
+    }
     return { error: { message: error.message || 'Failed to create checkout session' } }
   }
 

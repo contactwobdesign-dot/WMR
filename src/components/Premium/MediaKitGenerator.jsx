@@ -7,6 +7,8 @@ import {
   PDFDownloadLink,
   Font,
 } from '@react-pdf/renderer'
+import { useEffect } from 'react'
+import { usePostHog } from 'posthog-js/react'
 import { FileText, Download } from 'lucide-react'
 
 // Font.register({
@@ -309,6 +311,22 @@ export const MediaKitButton = ({
   console.log('MediaKitButton Data:', { calculationData, currencySymbol, user })
   console.log('PDF User Data Received:', user)
 
+  const posthog = usePostHog()
+
+  useEffect(() => {
+    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    if (posthog && !isLocalhost) {
+      try {
+        posthog.capture('media_kit_viewed', {
+          platform: calculationData?.platform || null,
+        })
+      } catch (err) {
+        console.error('PostHog media_kit_viewed error:', err)
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   if (
     !userData ||
     !calculationData ||
@@ -357,6 +375,16 @@ export const MediaKitButton = ({
 
         if (error) {
           console.error('PDF Error:', error)
+          const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+          if (posthog && !isLocalhost) {
+            try {
+              posthog.capture('media_kit_download_error', {
+                message: error.message || String(error),
+              })
+            } catch (e) {
+              console.error('PostHog media_kit_download_error error:', e)
+            }
+          }
           return (
             <>
               <FileText size={20} />

@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
+import { usePostHog } from 'posthog-js/react'
 import { supabase } from '../lib/supabase'
 import { SITE_URL } from '../lib/appConfig'
 
@@ -20,6 +21,7 @@ const AuthContext = createContext({
 // Auth Provider Component
 export function AuthProvider({ children }) {
   const { t } = useTranslation()
+  const posthog = usePostHog()
   const [user, setUser] = useState(null)
   const [subscription, setSubscription] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -160,12 +162,32 @@ export function AuthProvider({ children }) {
         if (!mounted) return
         console.log('Auth event:', event)
 
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          if (session?.user) {
-            fetchProfileAndApply(session.user)
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+        const canTrack = posthog && !isLocalhost
+
+        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+          if (canTrack) {
+            try {
+              posthog.identify(session.user.id, {
+                email: session.user.email,
+                plan: 'free',
+              })
+            } catch (e) {
+              console.error('PostHog identify error:', e)
+            }
           }
+
+          fetchProfileAndApply(session.user)
           if (mounted) setLoading(false)
         } else if (event === 'SIGNED_OUT') {
+          if (canTrack) {
+            try {
+              posthog.reset()
+            } catch (e) {
+              console.error('PostHog reset error:', e)
+            }
+          }
+
           setUser(null)
           setSubscription(null)
           setIsSubscriptionLoaded(true)

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { usePostHog } from 'posthog-js/react'
 import {
   PLATFORMS,
   NICHES,
@@ -18,6 +19,7 @@ import { Tooltip } from '../UI/Tooltip'
 function FreeCalculatorForm({ onSubmit, disabled = false }) {
   const { t } = useTranslation()
   const { formatPrice, currencySymbol } = useCurrency()
+   const posthog = usePostHog()
   const [formData, setFormData] = useState({
     platform: '',
     niche: '',
@@ -163,13 +165,29 @@ function FreeCalculatorForm({ onSubmit, disabled = false }) {
     }
 
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return newErrors
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!validate()) return
+    const newErrors = validate()
+    const isValid = Object.keys(newErrors).length === 0
+
+    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    if (!isValid) {
+      if (posthog && !isLocalhost) {
+        try {
+          posthog.capture('calculator_attempt_failed', {
+            missing_fields: Object.keys(newErrors),
+            platform: formData.platform || null,
+          })
+        } catch (err) {
+          console.error('PostHog calculator_attempt_failed error:', err)
+        }
+      }
+      return
+    }
     
     const isTwitch = formData.platform === 'twitch'
     
@@ -187,6 +205,22 @@ function FreeCalculatorForm({ onSubmit, disabled = false }) {
       submitData.subscribers = parseInt(formData.subscribers)
       submitData.averageViews = parseInt(formData.averageViews)
       submitData.engagementRate = parseFloat(formData.engagementRate)
+    }
+    
+    // Tracking succès calculateur
+    const views = isTwitch
+      ? submitData.averageConcurrentViewers
+      : submitData.averageViews
+    if (posthog && !isLocalhost) {
+      try {
+        posthog.capture('calculator_success', {
+          platform: submitData.platform,
+          niche: submitData.niche,
+          views,
+        })
+      } catch (err) {
+        console.error('PostHog calculator_success error:', err)
+      }
     }
     
     // Sauvegarder les champs "stables" dans le localStorage
