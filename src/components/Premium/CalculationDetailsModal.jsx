@@ -255,7 +255,7 @@ export default function CalculationDetailsModal({
               </div>
             )}
 
-            {difference > 0 && calculation.verdict !== 'GOOD' && (
+            {difference > 0 && (verdict === 'TOO_LOW' || verdict === 'WAY_TOO_LOW') && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="font-medium text-red-800">
                   {premium
