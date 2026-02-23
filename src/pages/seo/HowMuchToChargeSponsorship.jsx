@@ -1,12 +1,15 @@
 import { SEOPageLayout } from '../../components/SEO'
+import { useTranslation } from 'react-i18next'
 
 function HowMuchToChargeSponsorship() {
+  const { t } = useTranslation()
+
   return (
     <SEOPageLayout
-      title="How Much Should You Charge for Sponsorships?"
-      subtitle="The complete guide to pricing brand deals in 2025"
-      metaTitle="How Much to Charge for Sponsorships - Creator Pricing Guide 2025"
-      metaDescription="Learn exactly how much to charge for sponsorships on YouTube, Instagram, TikTok, and podcasts. Free calculator + expert pricing guide."
+      title={t('seo_pricing.title')}
+      subtitle={t('seo_pricing.subtitle')}
+      metaTitle={t('seo_pricing.meta_title')}
+      metaDescription={t('seo_pricing.meta_description')}
       canonicalPath="/how-much-to-charge-sponsorship"
       platform={null}
     >
