@@ -131,6 +131,29 @@ export default function CalculationDetailsModal({
   const percentageOfValue = fairRate > 0 && offered != null ? Math.round((offered / fairRate) * 100) : null
   const difference = avg && offered != null && offered < avg ? avg - offered : 0
   const offerIsExcellent = offered != null && avg != null && offered >= avg
+  const verdict = (calculation.verdict || '').toUpperCase()
+
+  let adviceBoxClasses = 'bg-amber-50 border-amber-200'
+  let adviceTextColor = 'text-amber-800'
+  let adviceKeyPremium = 'calculation_details_modal.advice_below_market_premium'
+  let adviceKeyFree = 'calculation_details_modal.advice_below_market_free'
+
+  if (verdict === 'GOOD') {
+    adviceBoxClasses = 'bg-green-50 border-green-200'
+    adviceTextColor = 'text-green-800'
+    adviceKeyPremium = 'calculation_details_modal.advice_good_premium'
+    adviceKeyFree = 'calculation_details_modal.advice_good_free'
+  } else if (verdict === 'ACCEPTABLE') {
+    adviceBoxClasses = 'bg-blue-50 border-blue-200'
+    adviceTextColor = 'text-blue-800'
+    adviceKeyPremium = 'calculation_details_modal.advice_acceptable_premium'
+    adviceKeyFree = 'calculation_details_modal.advice_acceptable_free'
+  } else if (verdict === 'WAY_TOO_LOW' || verdict === 'TOO_LOW') {
+    adviceBoxClasses = 'bg-amber-50 border-amber-200'
+    adviceTextColor = 'text-amber-800'
+    adviceKeyPremium = 'calculation_details_modal.advice_below_market_premium'
+    adviceKeyFree = 'calculation_details_modal.advice_below_market_free'
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -247,22 +270,18 @@ export default function CalculationDetailsModal({
 
           {/* COLONNE DROITE : Actionable Advice, Projected Earnings, Detailed Stats */}
           <div className="space-y-4">
-            {percentageOfValue != null && percentageOfValue < 100 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">
+            {calculation.verdict && (
+              <div className={`${adviceBoxClasses} border rounded-lg p-4`}>
+                <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${adviceTextColor}`}>
                   {t('calculation_details_modal.actionable_advice')}
                 </p>
-                {premium ? (
-                  <p className="text-blue-900">
-                    {t('calculation_details_modal.advice_below_market_premium', {
-                      percentage: percentageOfValue,
-                    })}
-                  </p>
-                ) : (
-                  <p className="text-blue-900">
-                    {t('calculation_details_modal.advice_below_market_free')}
-                  </p>
-                )}
+                <p className={`text-sm ${adviceTextColor.replace('800', '900')}`}>
+                  {premium
+                    ? t(adviceKeyPremium, {
+                        percentage: percentageOfValue ?? 0,
+                      })
+                    : t(adviceKeyFree)}
+                </p>
               </div>
             )}
 
