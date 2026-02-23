@@ -472,6 +472,17 @@
       "brand_offer": "Brand Offer",
       "fair_value": "Fair Value"
     },
+    "status": {
+      "active": "Active",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "verdict": {
+      "good": "Good deal",
+      "acceptable": "Fair",
+      "way_too_low": "Far below market",
+      "too_low": "Below market"
+    },
     "actions": {
       "media_kit": "Media Kit",
       "email_templates": "Email Templates",
@@ -1923,7 +1934,19 @@
     "financials": "Financials",
     "brand_offer": "Brand Offer",
     "wmr_recommended": "WMR Recommended",
-    "final_price": "Final Price"
+    "final_price": "Final Price",
+    "projected_earnings": "Projected Earnings",
+    "detailed_stats": "Detailed Stats",
+    "avg_views_label": "Avg Views:",
+    "engagement_label": "Engagement:",
+    "company_size_label": "Company Size:",
+    "audience_geo_label": "Audience:",
+    "advice_below_market_premium": "At {{percentage}}% of your fair value, this offer is priced below market. You should prepare a firm counter-offer.",
+    "advice_below_market_free": "This offer appears significantly below current market benchmarks. A strong, data-backed negotiation is recommended.",
+    "leaving_money_on_table_premium": "You are likely leaving {{amount}} on the table on this partnership.",
+    "leaving_money_on_table_free": "You are probably leaving a meaningful part of the brand's budget on the table.",
+    "draft_email": "Draft Email",
+    "close": "Close"
   },
   "email_templates": {
     "tip_prefix": "Tip:",

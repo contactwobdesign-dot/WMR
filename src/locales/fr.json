@@ -472,6 +472,17 @@
       "brand_offer": "Offre de la marque",
       "fair_value": "Valeur équitable"
     },
+    "status": {
+      "active": "En cours",
+      "won": "Gagné",
+      "lost": "Perdu"
+    },
+    "verdict": {
+      "good": "Bonne offre",
+      "acceptable": "Correcte",
+      "way_too_low": "Beaucoup trop bas",
+      "too_low": "Sous le marché"
+    },
     "actions": {
       "media_kit": "Media Kit",
       "email_templates": "Modèles d'email",
@@ -2044,7 +2055,22 @@
     "financials": "Financier",
     "brand_offer": "Offre marque",
     "wmr_recommended": "Recommandé WMR",
-    "final_price": "Prix final"
+    "final_price": "Prix final",
+    "market_value_range": "Fourchette de valeur marché",
+    "actionable_advice": "Conseils actionnables",
+    "projected_earnings": "Revenus projetés",
+    "detailed_stats": "Statistiques détaillées",
+    "avg_views_label": "Vues moy.:",
+    "engagement_label": "Engagement :",
+    "company_size_label": "Taille de l'entreprise :",
+    "audience_geo_label": "Audience :",
+    "fair_rate_label": "Tarif juste :",
+    "advice_below_market_premium": "À {{percentage}} % de votre valeur, cette offre est en dessous du marché. Envisagez une contre-proposition structurée.",
+    "advice_below_market_free": "Votre offre semble nettement en dessous des tarifs de marché observés. Une négociation ferme est recommandée.",
+    "leaving_money_on_table_premium": "Vous laissez potentiellement {{amount}} sur la table sur ce partenariat.",
+    "leaving_money_on_table_free": "Vous laissez probablement une partie significative du budget de la marque sur la table.",
+    "draft_email": "Rédiger un e-mail",
+    "close": "Fermer"
   },
   "email_templates": {
     "tip_prefix": "Conseil :",

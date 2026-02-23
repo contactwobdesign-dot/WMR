@@ -23,15 +23,43 @@ const formatDate = (dateString) => {
 }
 
 function getStatusBadge(status) {
-  switch (status) {
+  const raw = (status || 'active').toString().toLowerCase()
+  switch (raw) {
     case 'won':
-      return { label: 'Won', className: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
+      return { key: 'won', className: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
     case 'declined':
-      return { label: 'Lost', className: 'bg-rose-50 text-rose-700 border-rose-200' }
+    case 'lost':
+      return { key: 'lost', className: 'bg-rose-50 text-rose-700 border-rose-200' }
     case 'active':
     default:
-      return { label: 'Active', className: 'bg-amber-50 text-amber-700 border-amber-200' }
+      return { key: 'active', className: 'bg-amber-50 text-amber-700 border-amber-200' }
   }
+}
+
+function normalizeLocationLabel(loc) {
+  const key = String(loc || '').toLowerCase()
+  const map = {
+    global: 'Global',
+    worldwide: 'Worldwide',
+    north_america: 'North America',
+    latin_america: 'Latin America',
+    south_america: 'South America',
+    western_eu: 'Western Europe',
+    western_europe: 'Western Europe',
+    eastern_eu: 'Eastern Europe',
+    eastern_europe: 'Eastern Europe',
+    central_europe: 'Central Europe',
+    uk_ca_au: 'UK, CA, AU',
+    uk_ireland: 'UK & Ireland',
+    middle_east: 'Middle East',
+    mena: 'Middle East & North Africa',
+    north_africa: 'North Africa',
+    sub_saharan_africa: 'Sub-Saharan Africa',
+    south_asia: 'South Asia',
+    south_east_asia: 'Southeast Asia',
+    oceania: 'Oceania',
+  }
+  return map[key] || (loc || '—')
 }
 
 function getPercentageRange(percentage) {
@@ -54,30 +82,30 @@ function getVaguePercentageText(percent) {
 }
 
 /** Badge visuel pour le verdict (GOOD / FAIR / BAD). */
-function renderVerdictBadge(verdictStr) {
+function renderVerdictBadge(verdictStr, t) {
   const status = (verdictStr || '').toUpperCase().replace(/\s/g, '_')
   let Icon = MinusCircle
   let colorClasses = 'bg-amber-50 text-amber-700 border-amber-200'
-  let label = 'Fair'
+  let key = 'acceptable'
 
   if (status === 'GOOD') {
     Icon = CheckCircle
     colorClasses = 'bg-green-50 text-green-700 border-green-200'
-    label = 'Good'
+    key = 'good'
   } else if (status === 'ACCEPTABLE') {
     Icon = MinusCircle
     colorClasses = 'bg-amber-50 text-amber-700 border-amber-200'
-    label = 'Fair'
+    key = 'acceptable'
   } else if (status === 'WAY_TOO_LOW' || status === 'TOO_LOW') {
     Icon = AlertCircle
     colorClasses = 'bg-red-50 text-red-700 border-red-200'
-    label = 'Below market'
+    key = status === 'WAY_TOO_LOW' ? 'way_too_low' : 'too_low'
   }
 
   return (
     <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-bold text-sm tracking-wide ${colorClasses}`}>
       <Icon className="w-4 h-4 shrink-0" />
-      <span className="uppercase">{label}</span>
+      <span className="uppercase">{t(`dashboard.verdict.${key}`)}</span>
     </div>
   )
 }
@@ -118,7 +146,11 @@ export default function CalculationDetailsModal({
                 className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${statusInfo.className}`}
               >
                 <BadgeCheck className="w-3 h-3" />
-                {statusInfo.label}
+                <span className="uppercase">
+                  {typeof statusInfo.key === 'string'
+                    ? t(`dashboard.status.${statusInfo.key}`)
+                    : t('dashboard.status.active')}
+                </span>
               </span>
             </div>
             <p className="text-sm text-gray-600 capitalize">
@@ -141,10 +173,10 @@ export default function CalculationDetailsModal({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-6 py-4">
           {/* COLONNE GAUCHE : Verdict, Jauge, Fourchette, Money Left on Table */}
           <div className="space-y-4">
-            {calculation.verdict && renderVerdictBadge(calculation.verdict)}
+            {calculation.verdict && renderVerdictBadge(calculation.verdict, t)}
             <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4">
               <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
-                Market Value Range
+                {t('calculation_details_modal.market_value_range')}
               </p>
               {premium ? (
                 <>
@@ -153,12 +185,14 @@ export default function CalculationDetailsModal({
                   </p>
                   {calculation.offered_price != null && (
                     <p className="text-sm text-gray-600 mt-1">
-                      Brand offer: {formatPrice(calculation.offered_price)}
+                      {t('calculation_details_modal.brand_offer')}:{' '}
+                      {formatPrice(calculation.offered_price)}
                     </p>
                   )}
                   {avg != null && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Fair rate: {formatPrice(avg)}
+                      {t('calculation_details_modal.fair_rate_label')}{' '}
+                      {formatPrice(avg)}
                     </p>
                   )}
                 </>
@@ -202,8 +236,10 @@ export default function CalculationDetailsModal({
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="font-medium text-red-800">
                   {premium
-                    ? `You're potentially leaving ${formatPrice(difference)} on the table`
-                    : 'You are potentially leaving a significant amount on the table.'}
+                    ? t('calculation_details_modal.leaving_money_on_table_premium', {
+                        amount: formatPrice(difference),
+                      })
+                    : t('calculation_details_modal.leaving_money_on_table_free')}
                 </p>
               </div>
             )}
@@ -214,15 +250,17 @@ export default function CalculationDetailsModal({
             {percentageOfValue != null && percentageOfValue < 100 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">
-                  Actionable Advice
+                  {t('calculation_details_modal.actionable_advice')}
                 </p>
                 {premium ? (
                   <p className="text-blue-900">
-                    At {percentageOfValue}% of your value, this offer is below market. Consider negotiating.
+                    {t('calculation_details_modal.advice_below_market_premium', {
+                      percentage: percentageOfValue,
+                    })}
                   </p>
                 ) : (
                   <p className="text-blue-900">
-                    Your offer appears to be significantly below market rates. Strong negotiation is recommended.
+                    {t('calculation_details_modal.advice_below_market_free')}
                   </p>
                 )}
               </div>
@@ -230,7 +268,7 @@ export default function CalculationDetailsModal({
 
             <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4">
               <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
-                Projected Earnings
+                {t('calculation_details_modal.projected_earnings')}
               </p>
               {premium ? (
                 <p className="text-sm text-amber-800">
@@ -268,7 +306,7 @@ export default function CalculationDetailsModal({
               )}
               <div className={!premium ? 'select-none pointer-events-none blur-sm' : ''}>
                 <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
-                  Detailed Stats
+                  {t('calculation_details_modal.detailed_stats')}
                 </p>
                 <div className="grid grid-cols-1 gap-4 text-sm">
                   <div className="space-y-1">
@@ -277,17 +315,27 @@ export default function CalculationDetailsModal({
                       <Users className="w-4 h-4 text-gray-400" />
                       <span className="text-gray-900">{formatNumber(calculation.subscribers)} subs</span>
                     </div>
-                    <p className="text-xs text-gray-500">Avg Views: {formatNumber(calculation.average_views)}</p>
                     <p className="text-xs text-gray-500">
-                      Engagement: {(calculation.engagement_rate || 0).toFixed ? calculation.engagement_rate.toFixed(1) : calculation.engagement_rate || 0}%
+                      {t('calculation_details_modal.avg_views_label')}{' '}
+                      {formatNumber(calculation.average_views)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {t('calculation_details_modal.engagement_label')}{' '}
+                      {(calculation.engagement_rate || 0).toFixed ? calculation.engagement_rate.toFixed(1) : calculation.engagement_rate || 0}%
                     </p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('calculation_details_modal.sponsor_context')}</p>
-                    <p className="text-sm text-gray-900 capitalize">Company Size: {calculation.company_size || '—'}</p>
+                    <p className="text-sm text-gray-900 capitalize">
+                      {t('calculation_details_modal.company_size_label')}{' '}
+                      {calculation.company_size || '—'}
+                    </p>
                     <div className="flex items-center gap-2 text-sm text-gray-900 capitalize">
                       <Globe2 className="w-4 h-4 text-gray-400" />
-                      <span>Audience: {calculation.audience_location || '—'}</span>
+                      <span>
+                        {t('calculation_details_modal.audience_geo_label')}{' '}
+                        {normalizeLocationLabel(calculation.audience_location)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -339,7 +387,7 @@ export default function CalculationDetailsModal({
                 className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border border-primary-200 text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                Draft Email
+                {t('calculation_details_modal.draft_email')}
               </button>
             </div>
           </div>
@@ -347,7 +395,7 @@ export default function CalculationDetailsModal({
             onClick={onClose}
             className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors relative z-20"
           >
-            Close
+            {t('calculation_details_modal.close')}
           </button>
         </div>
       </div>
